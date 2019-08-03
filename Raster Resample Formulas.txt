@@ -1,0 +1,31 @@
+-------------------------------
+NJ-PA Composite Ridership Index
+-------------------------------
+
+linkExists.tif = ("rider50pa@1" > 0) * 1 + ("rider50pa@1" = 0) * 0
+
+lineExists.tif = ("rider50r@1" > 0) * 4 + ("rider50r@1" = 0) * 0
+
+addRast.tif = "linkExists@1" + "lineExists@1"
+
+linkQual.tif = (("addRast@1" = 5) OR ("addRast@1" = 1)) * 1 + (("addRast@1" != 5) OR ("addRast@1" != 1)) * 0
+
+lineQual.tif = ("addRast@1" = 4) * 1 + ("addRast@1" != 4) * 0
+
+riderOverall.tif = ("linkQual@1" * "rider50pa@1") + ("lineQual@1" * "rider50r@1")
+
+-----------------
+Reliability Score
+-----------------
+
+# Choppy-looking reliability score:
+
+weightedScore.tif = (("tti@1" * 2) + "otp50r@1" + "linkspeed50r@1") / 4
+
+# Smoothed with a 3x3 kernel:
+
+ws_smoothed.tif = "ws_focal@1" * "ws_multiplier@1"
+
+# Smoothed with a 3x3 kernel and factoring in ridership:
+
+riderOverlay.tif = "ws_focal@1" * "riderOverall@1"
